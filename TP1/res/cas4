@@ -1,7 +1,7 @@
 isOptimal ? true
 GAP : 0.0
 exploredNodes : 0
-solveTime : 0.03
+solveTime : 0.09
 objective value : 211
 probability : [0.82, 0.81, 0.82, 0.97, 0.78, 0.88]
 

@@ -1,5 +1,8 @@
 TOL = 0.00001
 
+using Random
+using PyPlot
+
 
 function cplexSolve(output::String)
 
@@ -108,6 +111,7 @@ function cplexSolve(output::String)
     end
 
     close(fout)
+    return solveTime, exploredNodes
 end
 
 
@@ -118,4 +122,59 @@ function run()
 
     output = "res/cas4"
     cplexSolve(output)
+end
+
+
+function run_random_tests()
+    Random.seed!(1234) 
+
+    global record_size = [i*10 for i in 1:20]
+    global record_time = []
+    global record_nodes = []
+
+    for i in 1:20
+        global n = i * 10
+        global m = n
+        global p=3
+        global q=3
+        global k = 6
+        global alpha = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        global proba = zeros(k*n, 4)
+        l=0
+        for e in 1:k
+            for c in 1:n
+                l +=1
+                proba[l, 1] = e
+                proba[l, 2] = rand(1:n)
+                proba[l, 3] = rand(1:m)
+                proba[l, 4] = round(rand(1:9) * 0.1, digits = 2)
+            end
+        end
+
+        global c = [[] for _ in 1:n]
+        for i in 1:n
+            c[i] = [rand(1:10) for _ in 1:m]
+        end
+        instance = "instance$n" * "x$n"
+
+        output = "res/random/" * instance
+        solveTime, exploredNodes = cplexSolve(output)
+        append!(record_time, solveTime)
+        append!(record_nodes, exploredNodes)
+    end
+
+    plot(record_size, record_time)
+    title("Computation time according to instances size")
+    xlabel("size")
+    ylabel("Time(s)")
+    savefig("res/random/" * "time.png")
+    close()
+
+
+    plot(record_size, record_nodes)
+    title("The number of explored nodes according to instances size")
+    xlabel("size")
+    ylabel("nodes")
+    savefig("res/random/" * "nodes.png")
+    close()
 end
