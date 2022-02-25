@@ -1,5 +1,7 @@
 TOL = 0.00001
 
+using Random
+using PyPlot
 
 # distance euclidienne
 dst(i, j, i_, j_) = sqrt( (i-i_)^2 + (j-j_)^2)
@@ -145,6 +147,7 @@ function Dinkelbach(output::String)
         println(fout)
     end
     close(fout)
+    return totalTime, totalNodes, ite
 end
 
 
@@ -153,4 +156,61 @@ function run()
     output = "res/cas3"
     Dinkelbach(output)
 
+end
+
+
+function run_random_tests()
+    Random.seed!(1234) 
+
+    global record_size = []
+    global record_time = []
+    global record_nodes = []
+    global record_ite = []
+
+    for i in 10:5:25
+        if i == 0
+            continue
+        end
+        global n = i
+        global m = n
+        global Amin = n*3
+        global Amax = rand(Amin+1:n*5)
+        global lambda = 20
+        global B = Amin * 30
+
+        global c = [[] for _ in 1:n]
+        for i in 1:n
+            c[i] = [rand(1:10) for _ in 1:m]
+        end
+
+        instance = "instance$n" * "x$n"
+        output = "res/random/" * instance
+        totalTime, totalNodes, ite = Dinkelbach(output)
+        append!(record_nodes, totalNodes)
+        append!(record_time, totalTime)
+        append!(record_ite, ite)
+        append!(record_size, i)
+    end
+
+    plot(record_size, record_time)
+    title("Computation time according to instances size")
+    xlabel("size")
+    ylabel("Time(s)")
+    savefig("res/random/" * "time.png")
+    close()
+
+
+    plot(record_size, record_nodes)
+    title("The number of explored nodes according to instances size")
+    xlabel("size")
+    ylabel("nodes")
+    savefig("res/random/" * "nodes.png")
+    close()
+
+    plot(record_size, record_ite)
+    title("The iterations of algo Dinkelbach according to instances size")
+    xlabel("size")
+    ylabel("iterations")
+    savefig("res/random/" * "ite.png")
+    close()
 end
