@@ -1,5 +1,6 @@
 TOL = 0.00001
 
+
 # distance euclidienne
 dst(i, j, i_, j_) = sqrt( (i-i_)^2 + (j-j_)^2)
 
@@ -7,7 +8,6 @@ dst(i, j, i_, j_) = sqrt( (i-i_)^2 + (j-j_)^2)
 Using cplex solver resolve P_λ problem
 """
 function cplexSolve(λ)
-
 
     # modelization
     M = Model(CPLEX.Optimizer) 
@@ -46,22 +46,23 @@ function cplexSolve(λ)
     @constraint(M, f == sum(dst(i, j, i_, j_) * d[i, j, i_, j_] for i in 1:n for j in 1:m for i_ in 1:n for j_ in 1:m if i!=i_ || j!=j_))
     @objective(M, Min, f - λ * g)
 
-    # start a chronometer
-    start = time()
-
     # solve the problem
     optimize!(M)
 
-    computationTime = time() - start
     exploredNodes = MOI.get(backend(M), MOI.NodeCount())
+    GAP = MOI.get(M, MOI.RelativeGap())
+    solveTime = MOI.get(M, MOI.SolveTime())
 
     # status of model
     status = termination_status(M)
     isOptimal = status==MOI.OPTIMAL
 
+
     println("isOptimal ? ", isOptimal)
-    println("time(s) = ", computationTime)
-    println("exploredNodes = ", exploredNodes)
+    println( "GAP : ", GAP)
+    println( "exploredNodes : ", exploredNodes)
+    println( "solveTime : ", round(solveTime, digits = 2))
+
 
     v_λ = 0
     x_λ = zeros(n, m)
@@ -69,14 +70,15 @@ function cplexSolve(λ)
     g_star = 0.0
     f_star = 0.0
 
-    if isOptimal
-        println("v(lambda) = ", objective_value(M))
-        v_λ = objective_value(M)
+    if has_values(M)
 
+        v_λ = objective_value(M)
         g_star = JuMP.value(g)
         f_star = JuMP.value(f)
-        println("f(d) = ", f_star)
-        println("g(x) = ", g_star)
+
+        println( "v_λ : ", v_λ)
+        println( "f(d) = ", f_star)
+        println( "g(x) = ", g_star)
 
         for i in 1:n
             for j in 1:m
@@ -94,30 +96,61 @@ function cplexSolve(λ)
         end
     end
 
-    return isOptimal, v_λ, x_λ, d_λ, f_star, g_star
+    return isOptimal, v_λ, x_λ, d_λ, f_star, g_star, solveTime, exploredNodes
 end
 
 
-function Dinkelbach()
-    include("MinFragmentation_opl.dat")
-    
+function Dinkelbach(output::String)
+    totalTime = 0.0
+    totalNodes = 0
+
     # step 1
     λ = lambda
     ite = 1
 
     # step 2
-    isOptimal, v_λ, x_λ, d_λ, f_star, g_star = cplexSolve(λ)
+    isOptimal, v_λ, x_λ, d_λ, f_star, g_star, solveTime, exploredNodes = cplexSolve(λ)
+    totalTime += solveTime
+    totalNodes += exploredNodes
 
     while isOptimal && ( v_λ > TOL || v_λ < -TOL)
         ite += 1
         #λ = sum(dst(i, j, i_, j_) * d_λ[i, j, i_, j_] for i in 1:n for j in 1:m for i_ in 1:n for j_ in 1:m)/sum(x_λ[i, j] for i in 1:n for j in 1:m)
         λ = f_star/g_star
-        isOptimal, v_λ, x_λ, d_λ, f_star, g_star = cplexSolve(λ)
+        isOptimal, v_λ, x_λ, d_λ, f_star, g_star, solveTime, exploredNodes = cplexSolve(λ)
+        totalTime += solveTime
+        totalNodes += exploredNodes
     end 
 
-    println("End of iteration with ", ite)
-    println("v(lambda) = ", v_λ, " with lambda = ", λ)
-    println("the total number celles selected = ", sum(x_λ))
-    println("f(d) = ", f_star)
-    println("g(x) = ", g_star)
+    fout = open(output, "w")
+
+    println(fout, "iterations :", ite)
+    println(fout, "totalTime : ", round(totalTime, digits = 2))
+    println(fout, "totalNodes : ", totalNodes)
+    println(fout, "v(λ) = ", v_λ)
+    println(fout, "DMPPV = ", round(λ, digits = 4))
+    println(fout, "total celles selected = ", round(Int, sum(x_λ)))
+    println(fout, "f(d) = ", f_star)
+    println(fout, "g(x) = ", g_star)
+    println(fout, "\n\n")
+
+    for i in 1:n
+        for j in 1:m
+            if x_λ[i, j] == 1.0
+                print(fout, '■')
+            else
+                print(fout, '□')
+            end
+        end
+        println(fout)
+    end
+    close(fout)
+end
+
+
+function run()
+    include("MinFragmentation_opl.dat")
+    output = "res/cas3"
+    Dinkelbach(output)
+
 end
