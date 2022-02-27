@@ -1,5 +1,8 @@
 TOL = 0.00001
 
+using Random
+using PyPlot
+
 
 function cplexSOlve()
 
@@ -54,5 +57,12 @@ function cplexSOlve()
 
         println("True expected value = ", sum(proba))
     end
+
+end
+
+
+function run()
+    include("DivGenetique_opl.dat")
+    cplexSOlve()
 
 end
