@@ -164,12 +164,23 @@ function analysis_Emax()
             plt.plot(record_r[e], record_cost[e], label = L" $E_{max}^t = $" * "$e", linewidth=3)
         end
 
-        legend()
+        plt.legend(loc="upper right", fontsize=6)
         title("L'évolution du coût total sous différente limite carbone", fontsize=14)
         xlabel("L'intervalle r", fontsize=14)
         ylabel("Coût total", fontsize=14)
         savefig("analysis_E_max/Emax_cout_test$test" * ".png")
         plt.close()
 
+
+        for e in EMAX
+            plt.plot(record_r[e], record_emission[e], label = L" $E_{max}^t = $" * "$e", linewidth=3)
+        end
+
+        plt.legend(loc="lower right", fontsize=6)
+        title("L'évolution de l'émission carbone moyenne sous différente limite carbone", fontsize=12)
+        xlabel("L'intervalle r", fontsize=14)
+        ylabel("L'émission carbone moyenne", fontsize=12)
+        savefig("analysis_E_max/Emax_emission_test$test" * ".png")
+        plt.close()
     end
 end
