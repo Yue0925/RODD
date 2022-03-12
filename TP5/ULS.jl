@@ -12,7 +12,6 @@ Pkg.build("PyCall")
 
 Random.seed!(1234) 
 
-#function data()
 global T = 12
 global M = 4
 global E = [3 for _ in 1:T]
@@ -21,7 +20,6 @@ global f = [10, 30, 60, 90]
 global e = [8, 6, 4, 2]
 global h = [1 for _ in 1:T]
 global p = zeros(Int, T, M)
-#end
 
 
 """
@@ -181,6 +179,87 @@ function analysis_Emax()
         xlabel("L'intervalle r", fontsize=14)
         ylabel("L'émission carbone moyenne", fontsize=12)
         savefig("analysis_E_max/Emax_emission_test$test" * ".png")
+        plt.close()
+    end
+end
+
+
+
+
+function analysis_Mode()
+    global d
+    global T
+    global E
+    global M
+    global p
+
+    global f # = [10, 30, 60, 90]
+    global e # = [8, 6, 4, 2]
+
+    E = [3 for _ in 1:T]
+
+    for test in 1:4
+        f = [10, 30, 60, 90]
+        e = [8, 6, 4, 2]
+
+        seed = rand(1:10000)
+        Random.seed!(seed) 
+        d = [rand(20:70) for _ in 1:T]
+
+        Mmax = [e for e in 4:10]
+        record_r = Dict(k => [] for k in Mmax)
+        record_cost = Dict(k => [] for k in Mmax)
+        record_emission = Dict(k => [] for k in Mmax)
+        record_times = Dict(k => [] for k in Mmax)
+
+        for m in Mmax
+            M = m
+            p = zeros(Int, T, M)
+            @show M
+
+            if size(f, 1) != M
+                append!(f, rand(1:10)*10)
+            end
+
+            if size(e, 1) != M
+                append!(e, rand(1:10))
+            end
+
+            for r in 1:T
+                total_cost, mean_emission_carbon, solveTime = cplexSolve(r)
+    
+                @show total_cost, mean_emission_carbon, solveTime
+                append!(record_r[m], r)
+                append!(record_cost[m], total_cost)
+                append!(record_emission[m], mean_emission_carbon)
+                append!(record_times[m], solveTime)
+            end
+        end
+
+        ssf = string(f)
+        sse = string(e)
+
+        for m in Mmax
+            plt.plot(record_r[m], record_cost[m], label = "M = $m", linewidth=3)
+        end
+
+        plt.legend(loc="upper right", fontsize=6)
+        title("L'évolution du coût total avec f = " * ssf * "\n et e = " * sse, fontsize=10)
+        xlabel("L'intervalle r", fontsize=14)
+        ylabel("Coût total", fontsize=14)
+        savefig("analysis_Mode/Mode_cout_test$test" * ".png")
+        plt.close()
+
+
+        for m in Mmax
+            plt.plot(record_r[m], record_emission[m], label = "M = $m", linewidth=3)
+        end
+
+        plt.legend(loc="lower right", fontsize=6)
+        title("L'évolution de l'émission carbone moyenne avec f = " * ssf * "\n et e = " * sse, fontsize=10)
+        xlabel("L'intervalle r", fontsize=14)
+        ylabel("L'émission carbone moyenne", fontsize=12)
+        savefig("analysis_Mode/Mode_emission_test$test" * ".png")
         plt.close()
     end
 end
