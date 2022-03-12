@@ -255,7 +255,7 @@ function analysis_Mode()
             plt.plot(record_r[m], record_emission[m], label = "M = $m", linewidth=3)
         end
 
-        plt.legend(loc="lower right", fontsize=6)
+        plt.legend(loc="upper left", fontsize=6)
         title("L'évolution de l'émission carbone moyenne avec f = " * ssf * "\n et e = " * sse, fontsize=10)
         xlabel("L'intervalle r", fontsize=14)
         ylabel("L'émission carbone moyenne", fontsize=12)
