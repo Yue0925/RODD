@@ -105,6 +105,7 @@ function analysis_r()
         record_times = []
         for r in 1:T
             total_cost, mean_emission_carbon, solveTime = cplexSolve(r)
+
             @show total_cost, mean_emission_carbon, solveTime
             append!(record_r, r)
             append!(record_cost, total_cost)
@@ -123,7 +124,52 @@ function analysis_r()
         ax2.set_ylabel("L'émission carbone moyenne", color="blue", fontsize=14)
         # plt.show()
 
-        savefig("analysis_r_test$test" * ".png")
-        # plt.close()
+        savefig("analysis_r/analysis_r_test$test" * ".png")
+        plt.close()
+    end
+end
+
+function analysis_Emax()
+    global d
+    global T
+    global E
+
+    for test in 1:4
+        seed = rand(1:10000)
+        Random.seed!(seed) 
+        d = [rand(20:70) for _ in 1:T]
+
+        EMAX = [e for e in 3:8]
+        record_r = Dict(k => [] for k in EMAX)
+        record_cost = Dict(k => [] for k in EMAX)
+        record_emission = Dict(k => [] for k in EMAX)
+        record_times = Dict(k => [] for k in EMAX)
+
+        for e in EMAX
+            E = [e for _ in 1:T]
+
+            for r in 1:T
+                total_cost, mean_emission_carbon, solveTime = cplexSolve(r)
+    
+                @show total_cost, mean_emission_carbon, solveTime
+                append!(record_r[e], r)
+                append!(record_cost[e], total_cost)
+                append!(record_emission[e], mean_emission_carbon)
+                append!(record_times[e], solveTime)
+            end
+        end
+
+
+        for e in EMAX
+            plt.plot(record_r[e], record_cost[e], label = L" $E_{max}^t = $" * "$e", linewidth=3)
+        end
+
+        legend()
+        title("L'évolution du coût total sous différente limite carbone", fontsize=14)
+        xlabel("L'intervalle r", fontsize=14)
+        ylabel("Coût total", fontsize=14)
+        savefig("analysis_E_max/Emax_cout_test$test" * ".png")
+        plt.close()
+
     end
 end
