@@ -2,11 +2,13 @@
 using Random
 import PyPlot; const plt = PyPlot
 
+
 """
 tape in julia terminal : 
 
 ENV["PYTHON"]=""
 Pkg.build("PyCall")
+
 """
 
 
@@ -131,6 +133,18 @@ function analysis_Emax()
     global d
     global T
     global E
+    global f 
+    global e
+    global p
+    global h
+    global M
+
+    M = 4
+    T = 12
+    f = [10, 30, 60, 90]
+    e = [8, 6, 4, 2]
+    h = [1 for _ in 1:T]
+    p = zeros(Int, T, M)
 
     for test in 1:4
         seed = rand(1:10000)
@@ -190,12 +204,14 @@ function analysis_Mode()
     global d
     global T
     global E
-    global M
+    global f 
+    global e
     global p
+    global h
+    global M
 
-    global f # = [10, 30, 60, 90]
-    global e # = [8, 6, 4, 2]
-
+    T = 12
+    h = [1 for _ in 1:T]
     E = [3 for _ in 1:T]
 
     for test in 1:4
@@ -260,6 +276,78 @@ function analysis_Mode()
         xlabel("L'intervalle r", fontsize=14)
         ylabel("L'émission carbone moyenne", fontsize=12)
         savefig("analysis_Mode/Mode_emission_test$test" * ".png")
+        plt.close()
+    end
+end
+
+
+
+function analysis_Horizon()
+    global d
+    global T
+    global E
+    global f 
+    global e
+    global p
+    global h
+    global M
+
+    M = 4
+    f = [10, 30, 60, 90]
+    e = [8, 6, 4, 2]
+
+    for test in 1:4
+
+        Horizon = [4*i for i in 3:7]
+
+        record_r = Dict(k => [] for k in Horizon)
+        record_cost = Dict(k => [] for k in Horizon)
+        record_emission = Dict(k => [] for k in Horizon)
+        record_times = Dict(k => [] for k in Horizon)
+
+        for t in Horizon
+            T = t
+            E = [3 for _ in 1:T]
+            h = [1 for _ in 1:T]
+            p = zeros(Int, T, M)
+
+            seed = rand(1:10000)
+            Random.seed!(seed) 
+            d = [rand(20:70) for _ in 1:T]
+
+            for r in 1:T
+                total_cost, mean_emission_carbon, solveTime = cplexSolve(r)
+    
+                @show total_cost, mean_emission_carbon, solveTime
+                append!(record_r[t], r)
+                append!(record_cost[t], total_cost)
+                append!(record_emission[t], mean_emission_carbon)
+                append!(record_times[t], solveTime)
+            end
+        end
+
+
+        for t in Horizon
+            plt.plot(record_r[t], record_cost[t], label = "T = $t", linewidth=3)
+        end
+
+        plt.legend(loc="upper right", fontsize=6)
+        title("L'évolution du coût total avec différent horizon", fontsize=14)
+        xlabel("L'intervalle r", fontsize=14)
+        ylabel("Coût total", fontsize=14)
+        savefig("analysis_horizon/T_cout_test$test" * ".png")
+        plt.close()
+
+
+        for t in Horizon
+            plt.plot(record_r[t], record_emission[t], label = "T = $t", linewidth=3)
+        end
+
+        plt.legend(loc="lower right", fontsize=6)
+        title("L'évolution de l'émission carbone moyenne avec différent horizon", fontsize=12)
+        xlabel("L'intervalle r", fontsize=14)
+        ylabel("L'émission carbone moyenne", fontsize=12)
+        savefig("analysis_horizon/T_emission_test$test" * ".png")
         plt.close()
     end
 end
