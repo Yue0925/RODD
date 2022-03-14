@@ -1,5 +1,6 @@
 
 using Random
+using PyPlot
 import PyPlot; const plt = PyPlot
 
 
@@ -49,8 +50,8 @@ function cplexSolve(r::Int64)
         x[t,m] <= sum(d[t_] for t_ in t:T) * y[t,m]
     )
 
-    @constraint(model, [t in 1:T-r],
-        sum( (e[m] - E[t_]) * x[t_, m] for t_ in t:t+r, m in 1:M) <= 0
+    @constraint(model, [t in 1:T-r+1],
+        sum( (e[m] - E[t_]) * x[t_, m] for t_ in t:t+r-1, m in 1:M) <= 0
     )
 
     set_silent(model) # turn off cplex output
@@ -173,7 +174,7 @@ function analysis_Emax()
 
 
         for e in EMAX
-            plt.plot(record_r[e], record_cost[e], label = L" $E_{max}^t = $" * "$e", linewidth=3)
+            plt.plot(record_r[e], record_cost[e], label = L" $E_{max}^t = $" * "$e", marker="o", linewidth=2.0, linestyle="--")
         end
 
         plt.legend(loc="upper right", fontsize=6)
@@ -185,7 +186,7 @@ function analysis_Emax()
 
 
         for e in EMAX
-            plt.plot(record_r[e], record_emission[e], label = L" $E_{max}^t = $" * "$e", linewidth=3)
+            plt.plot(record_r[e], record_emission[e], label = L" $E_{max}^t = $" * "$e", marker="o", linewidth=2.0, linestyle="--")
         end
 
         plt.legend(loc="lower right", fontsize=6)
@@ -256,7 +257,7 @@ function analysis_Mode()
         sse = string(e)
 
         for m in Mmax
-            plt.plot(record_r[m], record_cost[m], label = "M = $m", linewidth=3)
+            plt.plot(record_r[m], record_cost[m], label = "M = $m", marker="o", linewidth=2.0, linestyle="--")
         end
 
         plt.legend(loc="upper right", fontsize=6)
@@ -268,7 +269,7 @@ function analysis_Mode()
 
 
         for m in Mmax
-            plt.plot(record_r[m], record_emission[m], label = "M = $m", linewidth=3)
+            plt.plot(record_r[m], record_emission[m], label = "M = $m", marker="o", linewidth=2.0, linestyle="--")
         end
 
         plt.legend(loc="upper left", fontsize=6)
@@ -328,7 +329,7 @@ function analysis_Horizon()
 
 
         for t in Horizon
-            plt.plot(record_r[t], record_cost[t], label = "T = $t", linewidth=3)
+            plt.plot(record_r[t], record_cost[t], label = "T = $t", marker="o", linewidth=2.0, linestyle="--")
         end
 
         plt.legend(loc="upper right", fontsize=6)
@@ -340,7 +341,7 @@ function analysis_Horizon()
 
 
         for t in Horizon
-            plt.plot(record_r[t], record_emission[t], label = "T = $t", linewidth=3)
+            plt.plot(record_r[t], record_emission[t], label = "T = $t", marker="o", linewidth=2.0, linestyle="--")
         end
 
         plt.legend(loc="lower right", fontsize=6)
