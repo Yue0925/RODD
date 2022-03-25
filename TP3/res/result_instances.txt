@@ -1,0 +1,24 @@
+en limitant le nombre de progénitures de chaque individu à 3 :
+
+exploredNodes : 0
+solveTime : 0.008
+isOptimal ? true
+x = [1, 3, 3, 1, 3, 3, 2, 0] (sol admissible)
+Lower bound = 0.015588
+Log probabilites : [0.0 0.0; 0.0 0.015588; 0.0 0.0; 0.0 0.0; 0.0 0.0] (sol approximated)
+Real probability = [0.0 0.0; 0.0 0.015625; 0.0 0.0; 0.0 0.0; 0.0 0.0] (sol admissible)
+True expected value = 0.015625 (sol admissible)
+
+
+
+en limitant le nombre de progénitures de chaque individu à 2 : 
+
+
+exploredNodes : 0
+solveTime : 0.002
+isOptimal ? true
+x = [2, 2, 2, 2, 2, 2, 2, 2] (sol admissible)
+Lower bound = 0.062433
+Log probabilites : [0.0 0.0; 0.0 0.062433; 0.0 0.0; 0.0 0.0; 0.0 0.0] (sol approximated)
+Real probability = [0.0 0.0; 0.0 0.0625; 0.0 0.0; 0.0 0.0; 0.0 0.0] (sol admissible)
+True expected value = 0.0625 (sol admissible)
