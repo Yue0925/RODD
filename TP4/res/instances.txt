@@ -1,0 +1,63 @@
+
+## Instance 1
+
+
+-----------------
+------ P1 -------
+-----------------
+exploredNodes 0
+solveTime 0.002
+isOptimal ? true
+GAP = 0.0
+Species size e1 = 6630
+Species size e2 = 317.916
+the number of celles not cut : 21
+total boundary edges : 84
+obj_val : 8219.5782
+
+
+-----------------
+------ QLR ------
+-----------------
+exploredNodes 0
+solveTime 0.013
+isOptimal ? true
+GAP = 0.0
+Species size e1 = 6630
+Species size e2 = 317.916
+the number of celles not cut : 21
+total boundary edges : 84
+obj_val : 8219.5782
+
+
+
+
+
+## Instance 2
+
+-----------------
+------ P1 -------
+-----------------
+exploredNodes 0
+solveTime 0.004
+isOptimal ? true
+GAP = 0.0
+Species size e1 = 191
+Species size e2 = 60.555
+the number of celles not cut : 5
+total boundary edges : 16
+obj_val : 442.5554
+
+
+-----------------
+------ QLR ------
+-----------------
+exploredNodes 0
+solveTime 0.002
+isOptimal ? true
+GAP = 0.0
+Species size e1 = 191
+Species size e2 = 60.555
+the number of celles not cut : 5
+total boundary edges : 16
+obj_val : 442.5554

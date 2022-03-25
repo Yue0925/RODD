@@ -1,8 +1,8 @@
 
-
+"""
+Linearization of binary quadratic problem
+"""
 function cplexSolveQuadratricRelaxed()
-
-    include("ExplForet_opl.dat")
 
     M = Model(CPLEX.Optimizer)
 
@@ -34,6 +34,7 @@ function cplexSolveQuadratricRelaxed()
 
 
     # solve the problem
+    set_silent(M) # turn off cplex output
     optimize!(M)
 
     
@@ -44,23 +45,47 @@ function cplexSolveQuadratricRelaxed()
 
     exploredNodes = MOI.get(backend(M), MOI.NodeCount())
     GAP = MOI.get(M, MOI.RelativeGap())
-    solveTime = MOI.get(M, MOI.SolveTime())
+    solveTime = round(MOI.get(M, MOI.SolveTime()), digits = 3)
 
-    println(" exploredNodes ", exploredNodes)
-    println(" solveTime ", solveTime)
+    println("exploredNodes ", exploredNodes)
+    println("solveTime ", solveTime)
 
     # display solution
     println("isOptimal ? ", isOptimal)
     println("GAP = ", GAP)
 
 
-    if has_values(M)
-        obj_val = objective_value(M)
-        println("obj_val : ", obj_val)
+    if has_values(M) && isOptimal
+
+        e1_size = round(Int, sum(t[i-1][j-1] * (1 - JuMP.value(x[i, j])) for i in 2:m+1, j in 2:n+1))
+        println("Species size e1 = ", e1_size)
+
+
+        e2_size = round( g * L * sum( sum( JuMP.value(x[i, j]) -
+            JuMP.value(y[i, j, i_, j_]) + JuMP.value(x[i_, j_]) - JuMP.value(y[i, j, i_, j_]) for (i_, j_) in A(i, j)
+            ) for i in 1:m+1, j in 1:n+1
+        ), digits = 3)
+        println("Species size e2 = ", e2_size)
+
 
         # println(JuMP.value.(y[1, :, :, :]))
-        println(value.(x))
-        println("the number of celles not cut : ", sum(JuMP.value.(x)))
+        # println(value.(x)) 
+
+        total_celles_not_cut = round(Int, sum(JuMP.value.(x)))
+        println("the number of celles not cut : ", total_celles_not_cut)
+
+        total_boundary_edges = round(Int, sum( sum( JuMP.value(x[i, j]) -
+                JuMP.value(y[i, j, i_, j_]) + JuMP.value(x[i_, j_]) - JuMP.value(y[i, j, i_, j_]) for (i_, j_) in A(i, j)
+            ) for i in 1:m+1, j in 1:n+1
+        ))
+        println("total boundary edges : ", total_boundary_edges)
+
+
+        obj_val = round(objective_value(M), digits = 4)
+        println("obj_val : ", obj_val)
+
+    else
+        error("cplex cannot find opt sol ! ")
     end
 
     
@@ -68,10 +93,10 @@ end
 
 
 
-
+"""
+MIP model
+"""
 function cplexSolveP1()
-
-    include("ExplForet_opl.dat")
 
     M = Model(CPLEX.Optimizer)
 
@@ -94,8 +119,9 @@ function cplexSolveP1()
 
 
     # solve the problem
+    set_silent(M) # turn off cplex output
     optimize!(M)
-    println(solution_summary(M))
+    # println(solution_summary(M))
     
     # status of model
     status = termination_status(M)
@@ -104,24 +130,58 @@ function cplexSolveP1()
 
     exploredNodes = MOI.get(backend(M), MOI.NodeCount())
     GAP = MOI.get(M, MOI.RelativeGap())
-    solveTime = MOI.get(M, MOI.SolveTime())
+    solveTime = round(MOI.get(M, MOI.SolveTime()), digits = 3)
 
-    println(" exploredNodes ", exploredNodes)
-    println(" solveTime ", solveTime)
+    println("exploredNodes ", exploredNodes)
+    println("solveTime ", solveTime)
 
     # display solution
     println("isOptimal ? ", isOptimal)
     println("GAP = ", GAP)
 
 
-    if has_values(M)
-        obj_val = objective_value(M)
+    if has_values(M) && isOptimal
+
+        e1_size = round(Int, sum(t[i-1][j-1] * (1 - JuMP.value(x[i, j])) for i in 2:m+1, j in 2:n+1))
+        println("Species size e1 = ", e1_size)
+
+
+        e2_size = round( g * L * sum( 4 * JuMP.value(x[i, j]) - JuMP.value(d[i, j]) for i in 2:m+1, j in 2:n+1), digits = 3)
+        println("Species size e2 = ", e2_size)
+
+
+        total_celles_not_cut = round(Int, sum(JuMP.value.(x)))
+        println("the number of celles not cut : ", total_celles_not_cut)
+
+        total_boundary_edges = round(Int, sum( 4 * JuMP.value(x[i, j]) - JuMP.value(d[i, j]) for i in 2:m+1, j in 2:n+1))
+        println("total boundary edges : ", total_boundary_edges)
+
+
+        obj_val = round(objective_value(M), digits = 4)
         println("obj_val : ", obj_val)
 
-        println("JuMP.value.(x) : ", JuMP.value.(x))
-        println("the number of celles not cut : ", sum(JuMP.value.(x)))
+    else
+        error("cplex cannot find opt sol ! ")
     end
 
     
 end
 
+function run()
+    include("ExplForet_opl.dat")
+    # include("ExplForet2_opl.dat")
+
+
+    println("\n\n-----------------")
+    println("------ P1 -------")
+    println("-----------------")
+    cplexSolveP1()
+
+
+    println("\n\n-----------------")
+    println("------ QLR ------")
+    println("-----------------")
+    cplexSolveQuadratricRelaxed()
+
+
+end
