@@ -33,6 +33,10 @@ function cplexSolveQuadratricRelaxed()
     @constraint(M, [j in 1:n+1], -y[m+2, j, m+2, j+1] + x[m+2, j] + x[m+2, j+1] <= 1)
 
 
+    #TODO : imposed uncut number ≥ 60
+    @constraint(M, sum(x) ≥ 60)
+
+
     # solve the problem
     set_silent(M) # turn off cplex output
     optimize!(M)
@@ -117,6 +121,8 @@ function cplexSolveP1()
     @constraint(M, [j in 1:n], x[1, j] == 0)
     @constraint(M, [j in 1:n], x[m+2, j] == 0)
 
+    #TODO : imposed uncut number ≥ 60
+    @constraint(M, sum(x) ≥ 60)
 
     # solve the problem
     set_silent(M) # turn off cplex output
@@ -168,8 +174,8 @@ function cplexSolveP1()
 end
 
 function run()
-    include("ExplForet_opl.dat")
-    # include("ExplForet2_opl.dat")
+    # include("ExplForet_opl.dat")
+    include("ExplForet2_opl.dat")
 
 
     println("\n\n-----------------")
