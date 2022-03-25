@@ -1,8 +1,20 @@
+using Random
+using PyPlot
+import PyPlot; const plt = PyPlot
+
+global solveTime, e1_size, e2_size, total_celles_not_cut, total_boundary_edges, obj_val
+global m,n,t
+global P=1
+global w1=1
+global w2=5
+global L=3
+global g=1.26157
 
 """
 Linearization of binary quadratic problem
 """
 function cplexSolveQuadratricRelaxed()
+    global solveTime, e1_size, e2_size, total_celles_not_cut, total_boundary_edges, obj_val
 
     M = Model(CPLEX.Optimizer)
 
@@ -34,7 +46,7 @@ function cplexSolveQuadratricRelaxed()
 
 
     #TODO : imposed uncut number ≥ 60
-    @constraint(M, sum(x) ≥ 60)
+    # @constraint(M, sum(x) ≥ 60)
 
 
     # solve the problem
@@ -101,6 +113,7 @@ end
 MIP model
 """
 function cplexSolveP1()
+    global solveTime, e1_size, e2_size, total_celles_not_cut, total_boundary_edges, obj_val
 
     M = Model(CPLEX.Optimizer)
 
@@ -122,7 +135,7 @@ function cplexSolveP1()
     @constraint(M, [j in 1:n], x[m+2, j] == 0)
 
     #TODO : imposed uncut number ≥ 60
-    @constraint(M, sum(x) ≥ 60)
+    # @constraint(M, sum(x) ≥ 60)
 
     # solve the problem
     set_silent(M) # turn off cplex output
@@ -174,8 +187,8 @@ function cplexSolveP1()
 end
 
 function run()
-    # include("ExplForet_opl.dat")
-    include("ExplForet2_opl.dat")
+    include("ExplForet_opl.dat")
+    # include("ExplForet2_opl.dat")
 
 
     println("\n\n-----------------")
@@ -189,5 +202,128 @@ function run()
     println("-----------------")
     cplexSolveQuadratricRelaxed()
 
+end
 
+
+function random_test()
+    global solveTime, e1_size, e2_size, total_celles_not_cut, total_boundary_edges, obj_val
+    global m,n,t
+
+    record_grid = []
+    models = ["MIP", "QLR"]
+    record_times = Dict(m => [] for m in models)
+    record_e1 = Dict(m => [] for m in models)
+    record_e2 = Dict(m => [] for m in models)
+    record_uncut = Dict(m => [] for m in models)
+    record_boundaries = Dict(m => [] for m in models)
+    record_objvalue = Dict(m => [] for m in models)
+
+    for grid in 10:20
+        m = grid
+        n = grid
+        t = [[] for _ in 1:m]
+
+        for i in 1:m
+            t[i] = [rand(60:100) for _ in 1:m]
+        end
+
+        append!(record_grid, grid)
+
+        println("\n\n-----------------")
+        println("------ P1 -------")
+        println("-----------------")
+        cplexSolveP1()
+
+        append!(record_times["MIP"], solveTime)
+        append!(record_e1["MIP"], e1_size)
+        append!(record_e2["MIP"], e2_size)
+        append!(record_uncut["MIP"], total_celles_not_cut)
+        append!(record_boundaries["MIP"], total_boundary_edges)
+        append!(record_objvalue["MIP"], obj_val)
+
+
+
+        println("\n\n-----------------")
+        println("------ QLR ------")
+        println("-----------------")
+        cplexSolveQuadratricRelaxed()
+
+        append!(record_times["QLR"], solveTime)
+        append!(record_e1["QLR"], e1_size)
+        append!(record_e2["QLR"], e2_size)
+        append!(record_uncut["QLR"], total_celles_not_cut)
+        append!(record_boundaries["QLR"], total_boundary_edges)
+        append!(record_objvalue["QLR"], obj_val)
+    end
+
+    for m in models
+        plt.plot(record_grid, record_times[m], label = m, marker="o", linewidth=1.0, linestyle="--")
+    end
+
+    plt.legend(loc="upper left", fontsize=8)
+    title("Comparaison the computing time between two models", fontsize=12)
+    xlabel("Grid n x n", fontsize=12)
+    ylabel("Computation time(s)", fontsize=12)
+    savefig("res/times.png")
+    plt.close()
+
+
+    for m in models
+        plt.plot(record_grid, record_e1[m], label = m, marker="o", linewidth=1.0, linestyle="--")
+    end
+
+    plt.legend(loc="upper left", fontsize=8)
+    title("Comparaison the size of specie e1 between two models", fontsize=12)
+    xlabel("Grid n x n", fontsize=12)
+    ylabel("The number of specie e1", fontsize=12)
+    savefig("res/e1.png")
+    plt.close()
+
+
+    for m in models
+        plt.plot(record_grid, record_e2[m], label = m, marker="o", linewidth=1.0, linestyle="--")
+    end
+
+    plt.legend(loc="upper left", fontsize=8)
+    title("Comparaison the size of specie e2 between two models", fontsize=12)
+    xlabel("Grid n x n", fontsize=12)
+    ylabel("The number of specie e2", fontsize=12)
+    savefig("res/e2.png")
+    plt.close()
+
+    
+    for m in models
+        plt.plot(record_grid, record_uncut[m], label = m, marker="o", linewidth=1.0, linestyle="--")
+    end
+
+    plt.legend(loc="upper left", fontsize=8)
+    title("Comparaison the total uncut parcels between two models", fontsize=12)
+    xlabel("Grid n x n", fontsize=12)
+    ylabel("The number of uncut parcels", fontsize=12)
+    savefig("res/uncut.png")
+    plt.close()
+
+
+    for m in models
+        plt.plot(record_grid, record_boundaries[m], label = m, marker="o", linewidth=1.0, linestyle="--")
+    end
+
+    plt.legend(loc="upper left", fontsize=8)
+    title("Comparaison the boundary edges between two models", fontsize=12)
+    xlabel("Grid n x n", fontsize=12)
+    ylabel("The number of boundary edges", fontsize=12)
+    savefig("res/boundary.png")
+    plt.close()
+
+    for m in models
+        plt.plot(record_grid, record_objvalue[m], label = m, marker="o", linewidth=1.0, linestyle="--")
+    end
+
+    plt.legend(loc="upper left", fontsize=8)
+    title("Comparaison the objective value between two models", fontsize=12)
+    xlabel("Grid n x n", fontsize=12)
+    ylabel("Objective value", fontsize=12)
+    savefig("res/obj_value.png")
+    plt.close()
+    
 end
