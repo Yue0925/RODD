@@ -47,7 +47,7 @@ int rend;
 
 // objective
 minimize sum(p in Parcelles, a in InitArc) x[a][1][p];
-// answer 19, with time 0.37 (s), and 0 explored nodes
+// answer 19
 
 
 subject to {
@@ -60,8 +60,15 @@ subject to {
 	ctInitialNode:
 		forall( p in Parcelles)
 		  sum(a in InitArc) x[a][1][p] <= 1;
+  	  
+	// conservation flot on initial node
+	/*
+	ctConvInitial:
+		forall( p in Parcelles)
+		  sum(a in InitArc) x[a][1][p] == sum(a in Arcs) x[a][1][p];
+	*/
 
-	// forbiden arcs
+	//
 	ctForbiden:
 		forall( p in Parcelles)
 		  sum(a in Arcs : a not in InitArc) x[a][1][p] == 0;

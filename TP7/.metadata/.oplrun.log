@@ -178,3 +178,27 @@ Command-line arguments:  -clean -nl en_US -configuration /home/yue/MPRO/RODD/ROD
 
 !ENTRY ilog.odms.ide.opllang.remote 1 0 2022-03-23 18:03:04.598
 !MESSAGE Run Configuration1 in /home/yue/MPRO/RODD/RODD/TP7/OPLTP7
+!SESSION 2022-03-26 14:50:23.485 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.41 - pxa6480sr5fp41-20190919_01(SR5 FP41)
+JRE 1.8.0 Linux amd64-64-Bit Compressed References 20190911_427071 (JIT enabled, AOT enabled)
+OpenJ9   - d581d49
+OMR      - ca4db84
+IBM      - 5cfdf9c
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -clean -nl en_US -configuration /home/yue/MPRO/RODD/RODD/TP7/.metadata/workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-03-26 14:50:23.513
+!MESSAGE Run Configuration1 in /home/yue/MPRO/RODD/RODD/TP7/OPLTP7
+!SESSION 2022-03-26 14:53:33.456 -----------------------------------------------
+eclipse.buildId=unknown
+java.fullversion=8.0.5.41 - pxa6480sr5fp41-20190919_01(SR5 FP41)
+JRE 1.8.0 Linux amd64-64-Bit Compressed References 20190911_427071 (JIT enabled, AOT enabled)
+OpenJ9   - d581d49
+OMR      - ca4db84
+IBM      - 5cfdf9c
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -clean -nl en_US -configuration /home/yue/MPRO/RODD/RODD/TP7/.metadata/workspace_oplrun
+
+!ENTRY ilog.odms.ide.opllang.remote 1 0 2022-03-26 14:53:33.473
+!MESSAGE Run Configuration1 in /home/yue/MPRO/RODD/RODD/TP7/OPLTP7

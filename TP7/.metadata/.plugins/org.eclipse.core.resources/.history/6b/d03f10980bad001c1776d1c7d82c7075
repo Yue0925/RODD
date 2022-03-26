@@ -47,29 +47,32 @@ int rend;
 
 // objective
 minimize sum(p in Parcelles, a in InitArc) x[a][1][p];
-// answer 19, with time 0.37 (s), and 0 explored nodes
+// answer 19
 
 
 subject to {
-	// demand constraint
-	ctDemand:
-		forall(t in Periode, i in C[s[t]])
-		  sum(p in Parcelles, a in Arcs : a.f.j==i) x[a,t,p] * a.rend >= Demande[i, t];
- 
-	// at most one outgoing arc from initial vertex
-	ctInitialNode:
-		forall( p in Parcelles)
-		  sum(a in InitArc) x[a][1][p] <= 1;
-
-	// forbiden arcs
-	ctForbiden:
-		forall( p in Parcelles)
-		  sum(a in Arcs : a not in InitArc) x[a][1][p] == 0;
+  // demand constraint
+  forall(t in Periode, i in C[s[t]]) 
+  	sum(p in Parcelles, a in Arcs : a.f.j==i) x[a,t,p] * a.rend >= Demande[i, t];
   
-	// conservation flot
-	ctConv:
-		forall(p in Parcelles, t in 1..T-1, v in Sommets /*: v.j == 0 || v.j in C[s[t]]*/)
-		  sum(a in Arcs : a.f==v) x[a][t][p] == sum(a in Arcs : a.i==v) x[a][t+1][p];
+  // at most one outgoing arc from initial vertex
+  ctInitialNode:
+  	forall( p in Parcelles)
+  	  sum(a in InitArc) x[a][1][p] <= 1;
+  	  
+  // conservation flot on initial node
+  ctConvInitial:
+  	forall( p in Parcelles)
+  	  sum(a in InitArc) x[a][1][p] == sum(a in Arcs) x[a][1][p];
+
+  forall( p in Parcelles)
+    ctForbiden:
+    	sum(a in Arcs : a not in InitArc) x[a][1][p] == 0;
+  
+  // conservation flot
+  ctConv:
+  	forall(p in Parcelles, t in 1..T-1, v in Sommets : v.j == 0 || v.j in C[s[t]])
+  	  sum(a in Arcs : a.f==v) x[a][t][p] == sum(a in Arcs : a.i==v) x[a][t+1][p];
 }
 
 // Output the current result

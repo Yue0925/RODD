@@ -5563,3 +5563,18 @@ Command-line arguments:  -os linux -ws gtk -arch x86_64 -clean
 
 !ENTRY ilog.odms.ide.opllang 1 0 2022-03-23 18:03:33.770
 !MESSAGE concert_wrap.IloEndMT
+!SESSION 2022-03-26 14:20:12.414 -----------------------------------------------
+eclipse.buildId=Build R0
+java.fullversion=8.0.5.41 - pxa6480sr5fp41-20190919_01(SR5 FP41)
+JRE 1.8.0 Linux amd64-64-Bit Compressed References 20190911_427071 (JIT enabled, AOT enabled)
+OpenJ9   - d581d49
+OMR      - ca4db84
+IBM      - 5cfdf9c
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -os linux -ws gtk -arch x86_64 -clean
+
+!ENTRY ilog.odms.ide.core 1 0 2022-03-26 14:20:31.961
+!MESSAGE ODM Bundle is OFF
+
+!ENTRY ilog.odms.ide.opllang 1 0 2022-03-26 14:58:40.497
+!MESSAGE concert_wrap.IloEndMT
